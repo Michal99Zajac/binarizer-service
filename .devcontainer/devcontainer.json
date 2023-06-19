@@ -1,27 +1,30 @@
 {
-	"name": "Dev Container - Binarizer Service",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	"remoteUser": "root",
-	"containerUser": "root",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"rust-lang.rust-analyzer",
-				"shardulm94.trailing-spaces",
-				"oderwat.indent-rainbow",
-				"GitHub.copilot",
-				"mhutchie.git-graph",
-				"wayou.vscode-todo-highlight",
-				"streetsidesoftware.code-spell-checker",
-				"EditorConfig.EditorConfig",
-				"VisualStudioExptTeam.intellicode-api-usage-examples"
-			],
-			"settings": {
-				"editor.formatOnSave": true,
-				"editor.defaultFormatter": "EditorConfig.EditorConfig"
-			}
-		}
-	}
+  "name": "Dev Container - Binarizer Service",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "root",
+  "containerUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "shardulm94.trailing-spaces",
+        "oderwat.indent-rainbow",
+        "GitHub.copilot",
+        "mhutchie.git-graph",
+        "wayou.vscode-todo-highlight",
+        "streetsidesoftware.code-spell-checker",
+        "EditorConfig.EditorConfig",
+        "VisualStudioExptTeam.intellicode-api-usage-examples"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "EditorConfig.EditorConfig",
+        "[rust]": {
+          "editor.defaultFormatter": "rust-lang.rust-analyzer"
+        }
+      }
+    }
+  }
 }
