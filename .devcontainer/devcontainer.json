@@ -1,29 +1,27 @@
 {
-  "name": "Binarizer Service",
-  "dockerFile": "Dockerfile",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "workbench.colorTheme": "One Dark Pro Darker",
-        "workbench.iconTheme": "material-icon-theme",
-        "[rust]": {
-          "editor.formatOnSave": true,
-          "editor.defaultFormatter": "rust-lang.rust-analyzer"
-        }
-      },
-      "extensions": [
-        "rust-lang.rust-analyzer",
-        "oderwat.indent-rainbow",
-        "PKief.material-icon-theme",
-        "zhuangtongfa.material-theme",
-        "shardulm94.trailing-spaces",
-        "wayou.vscode-todo-highlight",
-        "EditorConfig.EditorConfig",
-        "mhutchie.git-graph",
-        "eamodio.gitlens",
-        "VisualStudioExptTeam.intellicode-api-usage-examples"
-      ]
-    }
-  },
-  "remoteUser": "vscode"
+	"name": "Dev Container - Binarizer Service",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"remoteUser": "root",
+	"containerUser": "root",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"shardulm94.trailing-spaces",
+				"oderwat.indent-rainbow",
+				"GitHub.copilot",
+				"mhutchie.git-graph",
+				"wayou.vscode-todo-highlight",
+				"streetsidesoftware.code-spell-checker",
+				"EditorConfig.EditorConfig",
+				"VisualStudioExptTeam.intellicode-api-usage-examples"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.defaultFormatter": "EditorConfig.EditorConfig"
+			}
+		}
+	}
 }
