@@ -1,0 +1,29 @@
+{
+  "name": "Binarizer Service",
+  "dockerFile": "Dockerfile",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "workbench.colorTheme": "One Dark Pro Darker",
+        "workbench.iconTheme": "material-icon-theme",
+        "[rust]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "rust-lang.rust-analyzer"
+        }
+      },
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "oderwat.indent-rainbow",
+        "PKief.material-icon-theme",
+        "zhuangtongfa.material-theme",
+        "shardulm94.trailing-spaces",
+        "wayou.vscode-todo-highlight",
+        "EditorConfig.EditorConfig",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "VisualStudioExptTeam.intellicode-api-usage-examples"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}

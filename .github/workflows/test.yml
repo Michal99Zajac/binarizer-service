@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
+    - name: Install OpenCV
+      run: |
+        sudo apt update
+        sudo apt install -y libopencv-dev clang libclang-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests

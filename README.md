@@ -8,6 +8,8 @@
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
+      - [Installing Rust](#installing-rust)
+      - [Installing OpenCV](#installing-opencv)
     - [Setting up Pre-commit Hooks](#setting-up-pre-commit-hooks)
     - [Building](#building)
     - [Running](#running)
@@ -18,7 +20,41 @@
 
 ### Prerequisites
 
-Ensure you have Rust installed. You can install it by following the instructions at [rust-lang.org](https://www.rust-lang.org/tools/install).
+Ensure you have Rust and OpenCV installed.
+
+#### Installing Rust
+
+You can install Rust by following the instructions at [rust-lang.org](https://www.rust-lang.org/tools/install).
+
+#### Installing OpenCV
+
+OpenCV can be installed via package managers or by building it from source.
+
+**On Ubuntu**:
+
+You can install OpenCV using `apt` package manager:
+
+```sh
+sudo apt update
+sudo apt install libopencv-dev
+```
+
+**On MacOS**:
+
+You can install OpenCV using `brew` package manager:
+
+```sh
+brew install opencv
+brew install llvm
+```
+
+**On Windows**:
+
+Install OpenCV by downloading the pre-built libraries from [OpenCV Release Page](https://opencv.org/releases/), and set environment variables according to the installation path.
+
+**Building from source**:
+
+If you prefer to build OpenCV from source, follow the instructions on the [official OpenCV documentation](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).
 
 ### Setting up Pre-commit Hooks
 
