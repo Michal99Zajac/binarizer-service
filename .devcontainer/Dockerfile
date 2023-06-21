@@ -24,3 +24,6 @@ ENV PATH="$POETRY_HOME/bin:${PATH}"
 
 # Check the installation of Poetry
 RUN poetry --version
+
+# Install packages
+RUN poetry install
