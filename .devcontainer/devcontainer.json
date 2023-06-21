@@ -1,30 +1,25 @@
 {
-  "name": "Dev Container - Binarizer Service",
+  "name": "Binarizer Service",
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "remoteUser": "root",
-  "containerUser": "root",
+  "workspaceFolder": "/app",
+  "forwardPorts": [
+    8000
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
-        "rust-lang.rust-analyzer",
-        "shardulm94.trailing-spaces",
-        "oderwat.indent-rainbow",
-        "GitHub.copilot",
-        "mhutchie.git-graph",
-        "wayou.vscode-todo-highlight",
-        "streetsidesoftware.code-spell-checker",
+        "ms-python.black-formatter",
+        "ms-azuretools.vscode-docker",
         "EditorConfig.EditorConfig",
-        "VisualStudioExptTeam.intellicode-api-usage-examples"
-      ],
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "EditorConfig.EditorConfig",
-        "[rust]": {
-          "editor.defaultFormatter": "rust-lang.rust-analyzer"
-        }
-      }
+        "ms-python.flake8",
+        "ms-python.isort",
+        "magicstack.MagicPython",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "rust-lang.rust-analyzer"
+      ]
     }
   }
 }

@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-python.black-formatter",
+    "ms-azuretools.vscode-docker",
+    "EditorConfig.EditorConfig",
+    "ms-python.flake8",
+    "ms-python.isort",
+    "magicstack.MagicPython",
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "rust-lang.rust-analyzer"
+  ]
+}

@@ -1,6 +1,10 @@
 {
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "EditorConfig.EditorConfig",
   "[rust]": {
-    "editor.formatOnSave": true,
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
   }
 }

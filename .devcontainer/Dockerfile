@@ -1,13 +1,7 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+FROM mcr.microsoft.com/devcontainers/python:3.11
 
 # Update the system
 RUN apt-get update -y && apt-get upgrade -y
-
-# Install C++ tools
-RUN apt-get install -y build-essential cmake clang libclang-dev
-
-# Install OpenCV
-RUN apt-get install -y libopencv-dev
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -18,3 +12,14 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # Check the installation of Rust and Cargo
 RUN rustc --version
 RUN cargo --version
+
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Add Poetry to the path (necessary to use poetry)
+ENV PATH="$HOME/.local/bin:${PATH}"
+
+# Check the installation of Poetry
+RUN poetry --version
+
+WORKDIR /app

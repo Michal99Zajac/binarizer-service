@@ -1,0 +1,26 @@
+[MASTER]
+disable=
+    C, ; convention typically ignored by pylint
+    R, ; refactor typically ignored by pylint
+    W, ; warning typically ignored by pylint
+    I, ; info typically ignored by pylint
+
+[MESSAGES CONTROL]
+# Disable the message, report, category or checker with the given id(s).
+disable=
+    too-many-branches,
+    too-many-arguments,
+    too-many-locals,
+    too-many-lines,
+    no-else-return,
+    no-else-raise,
+    too-many-return-statements,
+    too-many-instance-attributes,
+    attribute-defined-outside-init,
+    too-few-public-methods,
+    unused-argument,
+    protected-access,
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    no-self-use

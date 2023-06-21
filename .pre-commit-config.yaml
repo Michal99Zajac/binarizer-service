@@ -1,0 +1,26 @@
+repos:
+  - repo: https://github.com/ambv/black
+    rev: 23.3.0
+    hooks:
+    - name: black
+      id: black
+      language_version: python3.11
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/mirrors-pylint
+    rev: v3.0.0a5
+    hooks:
+    - id: pylint
+      args: [--errors-only]
+
+  - repo: https://github.com/myint/autoflake
+    rev: v2.1.1
+    hooks:
+    - id: autoflake
+      args: [--remove-all-unused-imports, --remove-unused-variables, --ignore-init-module-imports]
