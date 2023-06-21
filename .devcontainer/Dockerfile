@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/python:3.11
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 # Update the system
 RUN apt-get update -y && apt-get upgrade -y
@@ -13,13 +13,14 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustc --version
 RUN cargo --version
 
+# Set the Poetry home directory
+ENV POETRY_HOME=/root/.poetry
+
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # Add Poetry to the path (necessary to use poetry)
-ENV PATH="$HOME/.local/bin:${PATH}"
+ENV PATH="$POETRY_HOME/bin:${PATH}"
 
 # Check the installation of Poetry
 RUN poetry --version
-
-WORKDIR /app

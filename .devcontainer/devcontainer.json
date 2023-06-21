@@ -3,10 +3,11 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/app",
   "forwardPorts": [
     8000
   ],
+  "containerUser": "root",
+  "remoteUser": "root",
   "customizations": {
     "vscode": {
       "extensions": [
