@@ -1,94 +1,95 @@
+import asyncio
+from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack, RTCIceCandidate
+import websockets
 import json
-import os
 
-import cv2
-from aiohttp import web
-from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
-from av import VideoFrame
-
-ROOT = os.path.dirname(__file__)
-PUBLIC = os.path.join(ROOT, "..", "public")
+# Define a BYE constant
+BYE = "BYE"
 
 
-class EchoTrack(MediaStreamTrack):
-    """
-    A MediaStreamTrack that echoes the frames from another track.
-    """
+class Signaling:
+    def __init__(self, url):
+        self.url = url
+        self.websocket = None
 
-    kind = "video"
+    async def connect(self):
+        self.websocket = await websockets.connect(self.url)
 
-    def __init__(self, track: VideoFrame) -> None:
-        super().__init__()  # don't forget to call super()
+    async def disconnect(self):
+        if self.websocket is not None:
+            await self.websocket.close()
+
+    async def send(self, data):
+        if self.websocket is not None:
+            await self.websocket.send(json.dumps(data))
+        else:
+            raise ConnectionError("Not connected to a WebSocket.")
+
+    async def receive(self):
+        if self.websocket is not None:
+            msg = await self.websocket.recv()
+            return json.loads(msg)
+        else:
+            raise ConnectionError("Not connected to a WebSocket.")
+
+
+class VideoTransformTrack(VideoStreamTrack):
+    def __init__(self, track):
+        super().__init__()  # don't forget this!
         self.track = track
 
-    async def recv(self) -> VideoFrame:
+    async def recv(self):
         frame = await self.track.recv()
 
-        # Convert the frame to a numpy array
-        img = frame.to_ndarray(format="bgr24")
-
-        # Convert the image to grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        # Apply adaptive binarization
-        binarized = cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2
-        )
-
-        # Convert the binarized image back to a VideoFrame
-        frame = VideoFrame.from_ndarray(binarized, format="gray")
-
+        # simply pass the same frame forward
         return frame
 
 
-async def index(request: web.Request) -> web.Response:
-    content = open(os.path.join(PUBLIC, "index.html"), "r").read()
-    return web.Response(content_type="text/html", text=content)
+async def consume_signaling(pc, signaling):
+    while True:
+        obj = await signaling.receive()
+
+        if isinstance(obj, dict):
+            if "sdp" in obj and "type" in obj:
+                await pc.setRemoteDescription(RTCSessionDescription(**obj))
+
+                if obj["type"] == "offer":
+                    # send answer
+                    answer = await pc.createAnswer()
+                    await pc.setLocalDescription(answer)
+                    await signaling.send(
+                        {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+                    )
+            elif "candidate" in obj:
+                candidate = RTCIceCandidate(**obj["candidate"])
+                await pc.addIceCandidate(candidate)
+            elif obj == BYE:
+                print("Exiting")
+                break
 
 
-async def offer(request: web.Request) -> web.Response:
-    params = await request.json()
+async def run(pc, signaling):
+    @pc.on("track")
+    def on_track(track):
+        print("Track %s received" % track.kind)
+        if track.kind == "video":
+            local_video = VideoTransformTrack(track)
+            pc.addTrack(local_video)
 
-    # Create an offer
-    offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
+    await consume_signaling(pc, signaling)
 
+
+async def main():
     pc = RTCPeerConnection()
 
-    @pc.on("iceconnectionstatechange")
-    async def on_iceconnectionstatechange() -> None:
-        print("ICE connection state is %s" % pc.iceConnectionState)
-        if pc.iceConnectionState == "failed":
-            await pc.close()
+    signaling = Signaling("ws://localhost:8000")
+    await signaling.connect()
 
-    @pc.on("track")
-    def on_track(track: VideoFrame) -> None:
-        print("Track %s received" % track.kind)
-
-        if track.kind == "video":
-            pc.addTrack(EchoTrack(track))
-
-        @track.on("ended")
-        async def on_ended() -> None:
-            print("Track %s ended" % track.kind)
-
-    await pc.setRemoteDescription(offer)
-    answer = await pc.createAnswer()
-    await pc.setLocalDescription(answer)
-
-    return web.Response(
-        content_type="application/json",
-        text=json.dumps({"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}),
-    )
+    try:
+        await run(pc, signaling)
+    finally:
+        await pc.close()
+        await signaling.disconnect()
 
 
-async def handle_options(request: web.Request) -> None:
-    return web.Response(text="ok")
-
-
-app = web.Application()
-
-app.router.add_route("OPTIONS", "/offer", handle_options)
-app.router.add_post("/offer", offer)
-app.router.add_get("/", index)
-
-web.run_app(app, host="127.0.0.1", port=8000)
+asyncio.run(main())
