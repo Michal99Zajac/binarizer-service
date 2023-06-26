@@ -1,10 +1,9 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "EditorConfig.EditorConfig",
-  "[rust]": {
-    "editor.defaultFormatter": "rust-lang.rust-analyzer"
-  },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "xaver.clang-format"
   }
 }

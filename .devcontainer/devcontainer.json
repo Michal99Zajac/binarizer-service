@@ -3,23 +3,26 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "forwardPorts": [
-    8000
-  ],
-  "containerUser": "root",
-  "remoteUser": "root",
+  "forwardPorts": [8000],
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/poetry:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-python.black-formatter",
-        "ms-azuretools.vscode-docker",
-        "EditorConfig.EditorConfig",
-        "ms-python.flake8",
-        "ms-python.isort",
-        "magicstack.MagicPython",
-        "ms-python.vscode-pylance",
         "ms-python.python",
-        "rust-lang.rust-analyzer"
+        "ms-python.vscode-pylance",
+        "magicstack.MagicPython",
+        "ms-python.isort",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "ms-python.pylint",
+        "editorconfig.editorconfig",
+        "shardulm94.trailing-spaces",
+        "oderwat.indent-rainbow",
+        "GitHub.copilot",
+        "ms-azuretools.vscode-docker"
       ]
     }
   }

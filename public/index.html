@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Client</title>
+</head>
+<body>
+    <h1>WebRTC Client</h1>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay playsinline></video>
+    <button id="startButton">Start</button>
+
+    <script>
+    let pc = new RTCPeerConnection();
+
+    pc.ontrack = function(event) {
+      let remoteVideo = document.getElementById('remoteVideo');
+      if (remoteVideo.srcObject !== event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+          console.log('Received remote stream');
+      }
+    };
+
+    pc.oniceconnectionstatechange = function(event) {
+      console.log('ICE connection state change:', pc.iceConnectionState);
+      if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+        alert('Connection established.');
+      }
+    };
+
+    document.getElementById('startButton').addEventListener('click', function() {
+        // Get the local stream, show it in the local video element and send it
+        navigator.mediaDevices.getUserMedia({video: {
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    frameRate: { ideal: 60 }
+  }, audio: false})
+        .then(function(stream) {
+            // let localVideo = document.getElementById('localVideo');
+            // localVideo.srcObject = stream;
+            stream.getTracks().forEach(function(track) {
+                pc.addTrack(track, stream);
+            });
+            return pc.createOffer();
+        })
+        .then(function(offer) {
+            return pc.setLocalDescription(offer);
+        })
+        .then(function() {
+            // Send the offer to the server
+            return fetch('http://127.0.0.1:8000/offer', {
+                method: 'POST',
+                body: JSON.stringify({
+                    sdp: pc.localDescription.sdp,
+                    type: pc.localDescription.type
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(answer) {
+            return pc.setRemoteDescription(answer);
+        })
+        .catch(function(e) {
+            console.error(e);
+        });
+    });
+    </script>
+</body>
+</html>
