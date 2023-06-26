@@ -1,71 +1,10 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>WebRTC Client</title>
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-  </head>
-  <body>
-    <h2>WebRTC Test Client</h2>
-    <video autoplay playsinline></video>
-    <button id="start">Start</button>
-    <script>
-      const startButton = document.getElementById('start');
-      const video = document.querySelector('video');
-
-      // Simple function to get server connection
-      async function getServerConnection(pc) {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        const response = await fetch('/offer', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            sdp: pc.localDescription.sdp,
-            type: pc.localDescription.type
-          })
-        });
-
-        const answer = await response.json();
-
-        await pc.setRemoteDescription(answer);
-      }
-
-      startButton.addEventListener('click', async () => {
-        // Start the WebRTC connection
-        const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
-        const pc = new RTCPeerConnection(configuration);
-
-        // Get the video stream from the local webcam
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-
-        video.srcObject = stream;
-        video.play();
-
-        // When ICE candidate is received, send it to the server
-        // pc.onicecandidate = ({candidate}) => {
-        //   fetch('/candidate', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({ candidate })
-        //   });
-        // };
-
-        // When track is received from the server, add it to the video player
-        pc.ontrack = ({track, streams: [stream]}) => {
-          if (track.kind === 'video') {
-            video.srcObject = stream;
-          }
-        };
-
-        // Get server connection
-        await getServerConnection(pc);
-      });
-    </script>
-  </body>
+</head>
+<body>
+    <video autoplay></video>
+    <script src="js/client.js"></script>
+</body>
 </html>
