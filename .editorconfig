@@ -16,3 +16,6 @@ indent_size = 4
 
 [*.json]
 insert_final_newline = lf
+
+[*.html]
+indent_size = 2

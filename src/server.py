@@ -87,7 +87,6 @@ async def handle_options(request: web.Request) -> None:
 
 app = web.Application()
 
-
 app.router.add_route("OPTIONS", "/offer", handle_options)
 app.router.add_post("/offer", offer)
 app.router.add_get("/", index)
