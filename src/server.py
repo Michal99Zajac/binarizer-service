@@ -8,29 +8,15 @@ BYE = "BYE"
 
 
 class Signaling:
-    def __init__(self, url):
-        self.url = url
-        self.websocket = None
-
-    async def connect(self):
-        self.websocket = await websockets.connect(self.url)
-
-    async def disconnect(self):
-        if self.websocket is not None:
-            await self.websocket.close()
+    def __init__(self, websocket):
+        self.websocket = websocket
 
     async def send(self, data):
-        if self.websocket is not None:
-            await self.websocket.send(json.dumps(data))
-        else:
-            raise ConnectionError("Not connected to a WebSocket.")
+        await self.websocket.send(json.dumps(data))
 
     async def receive(self):
-        if self.websocket is not None:
-            msg = await self.websocket.recv()
-            return json.loads(msg)
-        else:
-            raise ConnectionError("Not connected to a WebSocket.")
+        msg = await self.websocket.recv()
+        return json.loads(msg)
 
 
 class VideoTransformTrack(VideoStreamTrack):
@@ -68,7 +54,10 @@ async def consume_signaling(pc, signaling):
                 break
 
 
-async def run(pc, signaling):
+async def handle_signaling(websocket, path):
+    signaling = Signaling(websocket)
+    pc = RTCPeerConnection()
+
     @pc.on("track")
     def on_track(track):
         print("Track %s received" % track.kind)
@@ -79,17 +68,7 @@ async def run(pc, signaling):
     await consume_signaling(pc, signaling)
 
 
-async def main():
-    pc = RTCPeerConnection()
+start_server = websockets.serve(handle_signaling, "127.0.0.1", 8000)
 
-    signaling = Signaling("ws://localhost:8000")
-    await signaling.connect()
-
-    try:
-        await run(pc, signaling)
-    finally:
-        await pc.close()
-        await signaling.disconnect()
-
-
-asyncio.run(main())
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

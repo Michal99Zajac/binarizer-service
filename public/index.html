@@ -1,49 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebRTC Video Chat</title>
+    <title>Video Streaming Client</title>
 </head>
 <body>
-  <video id="localVideo" autoplay playsinline></video>
-  <script>
+    <h1>Video Streaming Client</h1>
+    <video id="localVideo" autoplay></video>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script>
     const pc = new RTCPeerConnection();
-    const localVideo = document.querySelector('#localVideo');
-    const ws = new WebSocket('ws://localhost:8000');
+    const video = document.querySelector("#localVideo");
 
-    // handle incoming messages from the signaling server
-    ws.onmessage = function(event) {
-      const msg = JSON.parse(event.data);
-      if (msg.type === 'offer') {
-        pc.setRemoteDescription(new RTCSessionDescription(msg))
-          .then(() => pc.createAnswer())
-          .then(answer => pc.setLocalDescription(answer))
-          .then(() => ws.send(JSON.stringify(pc.localDescription)));
-      } else if (msg.type === 'answer') {
-        pc.setRemoteDescription(new RTCSessionDescription(msg));
-      }
+    pc.ontrack = function (event) {
+        video.srcObject = event.streams[0];
     };
 
-    // get video/voice stream from webcam
-    navigator.mediaDevices.getUserMedia({video: true, audio: true})
-      .then(stream => {
-        // Show stream in a video tag
-        localVideo.srcObject = stream;
+    const ws = new WebSocket("ws://127.0.0.1:8000");
 
-        // send stream to peer connection
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-      });
-
-    pc.ontrack = function(event) {
-      localVideo.srcObject = event.streams[0];
+    ws.onmessage = function (event) {
+        const msg = JSON.parse(event.data);
+        if (msg.sdp) {
+            const desc = new RTCSessionDescription(msg);
+            pc.setRemoteDescription(desc).then(function () {
+                if (desc.type == "offer") {
+                    pc.createAnswer().then(function (answer) {
+                        return pc.setLocalDescription(answer);
+                    }).then(function () {
+                        ws.send(JSON.stringify(pc.localDescription));
+                    });
+                }
+            });
+        } else if (msg.candidate) {
+            pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+        } else if (msg == "BYE") {
+            ws.close();
+        }
     };
 
-    // create an offer
-    pc.createOffer()
-      .then(offer => pc.setLocalDescription(offer))
-      .then(() => {
-        // send the offer to the signaling server
-        ws.send(JSON.stringify(pc.localDescription));
-      });
-  </script>
+    ws.onopen = function () {
+        const offerOptions = {
+            offerToReceiveAudio: 1,
+            offerToReceiveVideo: 1
+        };
+        pc.createOffer(offerOptions).then(function (offer) {
+            return pc.setLocalDescription(offer);
+        }).then(function () {
+            ws.send(JSON.stringify(pc.localDescription));
+        });
+    };
+    </script>
 </body>
 </html>
