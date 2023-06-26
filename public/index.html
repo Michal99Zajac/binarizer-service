@@ -1,53 +1,71 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Video Streaming Client</title>
-</head>
-<body>
-    <h1>Video Streaming Client</h1>
-    <video id="localVideo" autoplay></video>
+  <head>
+    <title>WebRTC Client</title>
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  </head>
+  <body>
+    <h2>WebRTC Test Client</h2>
+    <video autoplay playsinline></video>
+    <button id="start">Start</button>
     <script>
-    const pc = new RTCPeerConnection();
-    const video = document.querySelector("#localVideo");
+      const startButton = document.getElementById('start');
+      const video = document.querySelector('video');
 
-    pc.ontrack = function (event) {
-        video.srcObject = event.streams[0];
-    };
+      // Simple function to get server connection
+      async function getServerConnection(pc) {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
 
-    const ws = new WebSocket("ws://127.0.0.1:8000");
-
-    ws.onmessage = function (event) {
-        const msg = JSON.parse(event.data);
-        if (msg.sdp) {
-            const desc = new RTCSessionDescription(msg);
-            pc.setRemoteDescription(desc).then(function () {
-                if (desc.type == "offer") {
-                    pc.createAnswer().then(function (answer) {
-                        return pc.setLocalDescription(answer);
-                    }).then(function () {
-                        ws.send(JSON.stringify(pc.localDescription));
-                    });
-                }
-            });
-        } else if (msg.candidate) {
-            pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
-        } else if (msg == "BYE") {
-            ws.close();
-        }
-    };
-
-    ws.onopen = function () {
-        const offerOptions = {
-            offerToReceiveAudio: 1,
-            offerToReceiveVideo: 1
-        };
-        pc.createOffer(offerOptions).then(function (offer) {
-            return pc.setLocalDescription(offer);
-        }).then(function () {
-            ws.send(JSON.stringify(pc.localDescription));
+        const response = await fetch('/offer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sdp: pc.localDescription.sdp,
+            type: pc.localDescription.type
+          })
         });
-    };
+
+        const answer = await response.json();
+
+        await pc.setRemoteDescription(answer);
+      }
+
+      startButton.addEventListener('click', async () => {
+        // Start the WebRTC connection
+        const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
+        const pc = new RTCPeerConnection(configuration);
+
+        // Get the video stream from the local webcam
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+        video.srcObject = stream;
+        video.play();
+
+        // When ICE candidate is received, send it to the server
+        // pc.onicecandidate = ({candidate}) => {
+        //   fetch('/candidate', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({ candidate })
+        //   });
+        // };
+
+        // When track is received from the server, add it to the video player
+        pc.ontrack = ({track, streams: [stream]}) => {
+          if (track.kind === 'video') {
+            video.srcObject = stream;
+          }
+        };
+
+        // Get server connection
+        await getServerConnection(pc);
+      });
     </script>
-</body>
+  </body>
 </html>
