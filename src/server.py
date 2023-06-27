@@ -55,7 +55,7 @@ async def offer(request: web.Request) -> web.Response:
 pcs: set = set()
 
 
-async def on_shutdown() -> None:
+async def on_shutdown(app: web.Application) -> None:
     # close peer connections
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
